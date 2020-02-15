@@ -4,9 +4,8 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-from voiceYourConcern.settings import FB_KEY,VERIFY_TOKEN
+from voiceYourConcern.settings import VERIFY_TOKEN
 
-import requests
 import json
 
 from vyc.vyc_bot_utils import respond_to_msg
