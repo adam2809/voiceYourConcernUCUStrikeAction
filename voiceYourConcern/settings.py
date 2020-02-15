@@ -25,7 +25,7 @@ SECRET_KEY = 'rwc-2$tjj4$*fi)tb-*c1or(3o0rt%g+00a-6%r4gyr4$ka)34'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['1fac94d1.ngrok.io']
 
 
 # Application definition
@@ -119,6 +119,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CSRF_COOKIE_SECURE=False
-CSRF_COOKIE_HTTPONLY=False
-SESSION_COOKIE_SECURE=False
+FB_KEY = os.environ['FB_KEY']
+VERIFY_TOKEN = os.environ['FB_VERIFY_TOKEN']
