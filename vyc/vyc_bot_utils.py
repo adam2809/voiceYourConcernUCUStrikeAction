@@ -2,16 +2,19 @@ import requests
 import json
 from voiceYourConcern.settings import FB_KEY
 
+GET_STARTED_RESPONSE_MSGS = [
+    'As students we want to support our lectures during the UCU strike action!',
+    'Learn more at https://www.ucu.org.uk/strikeforuss.',
+    'Would you like to voice you concern over how the university treats its emlpoees via email?[Yes/No]'
+]
+
 def respond_to_msg(event):
+    print(event)
     send_msg('jeb sie szmato',event['sender']['id'])
 
 
 def respond_to_get_started(event):
-    for msg in [
-        'As students we want to support our lectures during the UCU strike action!',
-        'Learn more at https://www.ucu.org.uk/strikeforuss.',
-        'Would you like to voice you concern over how the university treats its emlpoees via email?[Yes/No]'
-    ]:
+    for msg in GET_STARTED_RESPONSE_MSGS:
         send_msg(msg,event['sender']['id'])
 
 
