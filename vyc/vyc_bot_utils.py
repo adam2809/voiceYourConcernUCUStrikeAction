@@ -8,6 +8,19 @@ GET_STARTED_RESPONSE_MSGS = [
     'Would you like to voice you concern over how the university treats its emlpoees via email?[Yes/No]'
 ]
 
+
+def handle_message():
+    if req_body['object'] == 'page':
+        for entry in req_body['entry']:
+            for event in entry['messaging']:
+                if 'postback' in event and event['postback']['title'] == 'Get Started':
+                    respond_to_get_started(event)
+                    continue
+
+                if event['message'] and event['message']['text']:
+                    respond_to_msg(event)
+                    continue
+
 def respond_to_msg(event):
     print(event)
     send_msg('jeb sie szmato',event['sender']['id'])

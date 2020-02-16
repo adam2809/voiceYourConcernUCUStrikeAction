@@ -8,7 +8,9 @@ from voiceYourConcern.settings import VERIFY_TOKEN
 
 import json
 
-from vyc.vyc_bot_utils import respond_to_msg,respond_to_get_started
+from rest_framework.exceptions import *
+
+from vyc.vyc_bot_utils import handle_message
 
 
 class FacebookWebhooks(CreateView):
@@ -32,15 +34,6 @@ class FacebookWebhooks(CreateView):
         req_body = json.loads(request.read().decode('utf-8'))
 
         # TODO return an error if something goes wrong in respond_to_msg or any of the ifs fail
-        if req_body['object'] == 'page':
-            for entry in req_body['entry']:
-                for event in entry['messaging']:
-                    if 'postback' in event and event['postback']['title'] == 'Get Started':
-                        respond_to_get_started(event)
-                        continue
-
-                    if event['message'] and event['message']['text']:
-                        respond_to_msg(event)
-                        continue
+        handleMessage(req_body)
 
         return HttpResponse(status=200)
