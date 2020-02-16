@@ -34,6 +34,6 @@ class FacebookWebhooks(CreateView):
         req_body = json.loads(request.read().decode('utf-8'))
 
         # TODO return an error if something goes wrong in respond_to_msg or any of the ifs fail
-        handleMessage(req_body)
+        handle_message(req_body)
 
         return HttpResponse(status=200)
