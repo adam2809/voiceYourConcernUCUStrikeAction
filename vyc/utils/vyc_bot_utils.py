@@ -1,7 +1,7 @@
 import requests
 import json
 from voiceYourConcern.settings import FB_KEY
-from vyc.models import QA
+from vyc.models import QA,State
 
 GET_STARTED_RESPONSE_MSGS = [
     'As students we want to support our lectures during the UCU strike action!',
@@ -24,7 +24,7 @@ def dispatch_event(event):
     if 'postback' in event:
         dispatch_postback_event(event)
         return
-
+        
 
 def dispatch_postback_event(event):
     q,a = event['postback']['payload'].split('/')
@@ -110,26 +110,32 @@ def send_email_no_response(recipient_id):
 
 
 def use_template_yes_response(recipient_id):
-    send_msg('Gimmie your email',recipient_id)
+    set_state(recipient_id,'email_wait')
+    send_msg('Please input your email:',recipient_id)
 
 
 def use_template_no_response(recipient_id):
-    send_msg('Gimmie your content',recipient_id)
+    set_state(recipient_id,'content_wait')
+    send_msg('Input the content of your email below. The header and footer will be added automatically.',recipient_id)
 
 
 def confirm_input_content_ok_response(recipient_id):
-    send_msg('Content accepted',recipient_id)
+    set_state(recipient_id,'email_wait')
+    send_msg('The content of your message was set. Please input your email below:',recipient_id)
 
 
 def confirm_input_content_discard_response(recipient_id):
-    send_msg('Content thrown out',recipient_id)
+    clear_state(recipient_id)
+    send_msg('All changes were discarded. Click a menu button to start over.',recipient_id)
 
 
 def confirm_send_email_ok_response(recipient_id):
+    clear_state(recipient_id)
     send_msg('email sent',recipient_id)
 
 
 def confirm_send_email_discard_response(recipient_id):
+    clear_state(recipient_id)
     send_msg('email discarded',recipient_id)
 
 
@@ -174,3 +180,11 @@ def send_msg(text,recipient_id):
         headers = {'content-type': 'application/json'},
         data=json.dumps(payload)
     )
+
+def set_state(u_id,state):
+    clear_state(u_id)
+    State(u_id=u_id,state=state)
+
+
+def clear_state(u_id):
+    State.objects.filter(u_id=u_id).delete()
