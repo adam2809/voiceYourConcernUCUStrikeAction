@@ -5,6 +5,8 @@ class QA(models.Model):
     question = models.CharField(max_length=50)
     anwser = models.CharField(max_length=50)
 
+    def __str__(self):
+        return f'u_id = {self.u_id}\tquestion = {self.question}\tanwser = {self.anwser}\t'
 
 class State(models.Model):
     u_id = models.IntegerField()

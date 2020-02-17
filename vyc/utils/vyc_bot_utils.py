@@ -30,6 +30,10 @@ def dispatch_postback_event(event):
     q,a = event['postback']['payload'].split('/')
 
     if not q == 'get_started':
+        curr_qa = QA.objects.filter(
+            u_id=event['sender']['id'],
+            question=q,
+        ).delete()
         QA(
             u_id=event['sender']['id'],
             question=q,
