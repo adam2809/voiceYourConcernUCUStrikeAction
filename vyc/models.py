@@ -8,4 +8,4 @@ class QA(models.Model):
 
 class State(models.Model):
     u_id = models.IntegerField()
-    state = models.CharField(max_length=50)
+    state = models.CharField(max_length=50,default='')

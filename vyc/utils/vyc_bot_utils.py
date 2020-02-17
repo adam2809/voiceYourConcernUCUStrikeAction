@@ -27,9 +27,7 @@ def dispatch_event(event):
 
 
 def dispatch_postback_event(event):
-    tmp = event['postback']['payload'].split('/')
-    q = tmp[0]
-    a = tmp[1] if len(tmp) > 1 else None
+    q,a = event['postback']['payload'].split('/')
 
     if not q == 'get_started':
         QA(
@@ -38,47 +36,35 @@ def dispatch_postback_event(event):
             anwser=a,
         ).save()
 
-    if q == 'get_started':
-        respond_to_get_started(event)
-        return
+    qa_mapping = {
+        'get_started':{
+            'none' : get_started_response
+        },
+        'send_email':{
+            'yes' : send_email_yes_response,
+            'no' : send_email_no_response,
+        },
+        'use_template':{
+            'yes' : use_template_yes_response,
+            'no' : use_template_no_response,
+        },
+        'confirm_input_content':{
+            'ok' : confirm_input_content_ok_response,
+            'discard' : confirm_input_content_discard_response,
+        },
+        'confirm_send_email':{
+            'ok' : confirm_send_email_ok_response,
+            'discard' : confirm_send_email_discard_response,
+        },
+    }
+    qa_mapping[q][a](event['sender']['id'])
 
-    if q == 'send_email':
-        if a == 'yes':
-            start_send_email_convo(event['sender']['id'])
-        if a == 'no':
-            send_no_email_response(event['sender']['id'])
 
-
-def respond_to_msg(event):
-    send_msg('One of the page admins will respond shortly',event['sender']['id'])
-
-
-def respond_to_get_started(event):
+def get_started_response(recipient_id):
     for msg in GET_STARTED_RESPONSE_MSGS:
-        send_msg(msg,event['sender']['id'])
+        send_msg(msg,recipient_id)
 
-    show_send_email_postback_buttons(event['sender']['id'])
-
-
-def start_send_email_convo(recipient_id):
-    text = 'Would you like to use an email templete recommended by UCU?'
-    buttons = [
-        {
-            "type":"postback",
-            "title":"Yes",
-            "payload":"use_template/yes"
-        },
-        {
-            "type":"postback",
-            "title":"No",
-            "payload":"use_template/no"
-        },
-    ]
-    show_postback_buttons(recipient_id,text,buttons)
-
-
-def send_no_email_response(recipient_id):
-    send_msg('jak nie to nie',recipient_id)
+    show_send_email_postback_buttons(recipient_id)
 
 
 def show_send_email_postback_buttons(recipient_id):
@@ -96,6 +82,52 @@ def show_send_email_postback_buttons(recipient_id):
         },
     ]
     show_postback_buttons(recipient_id,text,buttons)
+
+
+def send_email_yes_response(recipient_id):
+    text = 'Would you like to use an email templete recommended by UCU?'
+    buttons = [
+        {
+            "type":"postback",
+            "title":"Yes",
+            "payload":"use_template/yes"
+        },
+        {
+            "type":"postback",
+            "title":"No",
+            "payload":"use_template/no"
+        },
+    ]
+    show_postback_buttons(recipient_id,text,buttons)
+
+
+def send_email_no_response(recipient_id):
+    send_msg('jak nie mejl to nie',recipient_id)
+
+
+def use_template_yes_response(recipient_id):
+    send_msg('Gimmie your email',recipient_id)
+
+
+def use_template_no_response(recipient_id):
+    send_msg('Gimmie your content',recipient_id)
+
+
+def confirm_input_content_ok_response(recipient_id):
+    send_msg('Content accepted',recipient_id)
+
+
+def confirm_input_content_discard_response(recipient_id):
+    send_msg('Content thrown out',recipient_id)
+
+
+def confirm_send_email_ok_response(recipient_id):
+    send_msg('email sent',recipient_id)
+
+
+def confirm_send_email_discard_response(recipient_id):
+    send_msg('email discarded',recipient_id)
+
 
 
 def show_postback_buttons(recipient_id,text,buttons):
@@ -138,11 +170,3 @@ def send_msg(text,recipient_id):
         headers = {'content-type': 'application/json'},
         data=json.dumps(payload)
     )
-
-
-SEND_EMAIL_POSTBACK_TO_FUNCTION_MAPPING = {
-    'yes': start_send_email_convo,
-    'no': send_no_email_response,
-    'use_template_yes': start_send_email_convo,
-    'use_template_no': start_send_email_convo,
-}
