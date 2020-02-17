@@ -1,6 +1,7 @@
 import requests
 import json
 from voiceYourConcern.settings import FB_KEY
+from vyc.models import QA
 
 GET_STARTED_RESPONSE_MSGS = [
     'As students we want to support our lectures during the UCU strike action!',
@@ -13,8 +14,6 @@ fb_api_url = f'https://graph.facebook.com/v6.0/me/messages?access_token={FB_KEY}
 
 
 def handle_message(req_body):
-    print(req_body)
-
     if req_body['object'] == 'page':
         for entry in req_body['entry']:
             for event in entry['messaging']:
@@ -31,6 +30,13 @@ def dispatch_postback_event(event):
     tmp = event['postback']['payload'].split('/')
     q = tmp[0]
     a = tmp[1] if len(tmp) > 1 else None
+
+    if not q == 'get_started':
+        QA(
+            u_id=event['sender']['id'],
+            question=q,
+            anwser=a,
+        ).save()
 
     if q == 'get_started':
         respond_to_get_started(event)
@@ -60,12 +66,12 @@ def start_send_email_convo(recipient_id):
         {
             "type":"postback",
             "title":"Yes",
-            "payload":"send_email/use_template_yes"
+            "payload":"use_template/yes"
         },
         {
             "type":"postback",
             "title":"No",
-            "payload":"send_email/use_template_no"
+            "payload":"use_template/no"
         },
     ]
     show_postback_buttons(recipient_id,text,buttons)

@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['1fac94d1.ngrok.io','localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    'vyc.apps.VycConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
