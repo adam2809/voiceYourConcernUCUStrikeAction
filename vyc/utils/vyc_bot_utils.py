@@ -10,6 +10,8 @@ GET_STARTED_RESPONSE_MSGS = [
 fb_api_url = f'https://graph.facebook.com/v6.0/me/messages?access_token={FB_KEY}'
 
 
+
+
 def handle_message(req_body):
     print(req_body)
 
@@ -24,9 +26,6 @@ def dispatch_event(event):
         dispatch_postback_event(event)
         return
 
-    if 'message' in event and event['message']['text']:
-        respond_to_msg(event)
-
 
 def dispatch_postback_event(event):
     tmp = event['postback']['payload'].split('/')
@@ -40,7 +39,7 @@ def dispatch_postback_event(event):
     if q == 'send_email':
         if a == 'yes':
             start_send_email_convo(event['sender']['id'])
-        else:
+        if a == 'no':
             send_no_email_response(event['sender']['id'])
 
 
@@ -56,7 +55,20 @@ def respond_to_get_started(event):
 
 
 def start_send_email_convo(recipient_id):
-    send_msg('pogadajmy o tym mejlu',recipient_id)
+    text = 'Would you like to use an email templete recommended by UCU?'
+    buttons = [
+        {
+            "type":"postback",
+            "title":"Yes",
+            "payload":"send_email/use_template_yes"
+        },
+        {
+            "type":"postback",
+            "title":"No",
+            "payload":"send_email/use_template_no"
+        },
+    ]
+    show_postback_buttons(recipient_id,text,buttons)
 
 
 def send_no_email_response(recipient_id):
@@ -64,6 +76,23 @@ def send_no_email_response(recipient_id):
 
 
 def show_send_email_postback_buttons(recipient_id):
+    text = "Send angry email?"
+    buttons = [
+        {
+            "type":"postback",
+            "title":"Yes",
+            "payload":"send_email/yes"
+        },
+        {
+            "type":"postback",
+            "title":"No",
+            "payload":"send_email/no"
+        },
+    ]
+    show_postback_buttons(recipient_id,text,buttons)
+
+
+def show_postback_buttons(recipient_id,text,buttons):
     payload = {
         "recipient":{
             "id":recipient_id
@@ -73,19 +102,8 @@ def show_send_email_postback_buttons(recipient_id):
                 "type":"template",
                 "payload":{
                     "template_type":"button",
-                    "text":"Send angry email?",
-                    "buttons":[
-                        {
-                            "type":"postback",
-                            "title":"Yes",
-                            "payload":"send_email/yes"
-                        },
-                        {
-                            "type":"postback",
-                            "title":"No",
-                            "payload":"send_email/no"
-                        },
-                    ]
+                    "text":text,
+                    "buttons":buttons
                 }
             }
         }
@@ -114,3 +132,11 @@ def send_msg(text,recipient_id):
         headers = {'content-type': 'application/json'},
         data=json.dumps(payload)
     )
+
+
+SEND_EMAIL_POSTBACK_TO_FUNCTION_MAPPING = {
+    'yes': start_send_email_convo,
+    'no': send_no_email_response,
+    'use_template_yes': start_send_email_convo,
+    'use_template_no': start_send_email_convo,
+}

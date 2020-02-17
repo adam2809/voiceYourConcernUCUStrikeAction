@@ -32,8 +32,7 @@ class FacebookWebhooks(CreateView):
 
     def post(self, request, *args, **kwargs):
         req_body = json.loads(request.read().decode('utf-8'))
-
-        # TODO return an error if something goes wrong in respond_to_msg or any of the ifs fail
+        
         handle_message(req_body)
 
         return HttpResponse(status=200)
