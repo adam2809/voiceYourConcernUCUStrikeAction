@@ -10,7 +10,7 @@ import json
 
 from rest_framework.exceptions import *
 
-from vyc.vyc_bot_utils import handle_message
+from vyc.utils.vyc_bot_utils import handle_message
 
 
 class FacebookWebhooks(CreateView):
