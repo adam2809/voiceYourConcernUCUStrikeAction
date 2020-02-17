@@ -121,3 +121,4 @@ STATIC_URL = '/static/'
 
 FB_KEY = os.environ['FB_KEY']
 VERIFY_TOKEN = os.environ['FB_VERIFY_TOKEN']
+SENDGRID_KEY = os.environ['SENDGRID_API_KEY']
