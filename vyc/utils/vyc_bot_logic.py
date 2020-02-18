@@ -3,6 +3,8 @@ import json
 from voiceYourConcern.settings import FB_KEY
 from vyc.models import QA,State
 
+from vyc.utils.vyc_bot_responses import MESSAGES,POSTBACKS
+
 GET_STARTED_RESPONSE_MSGS = [
     'As students we want to support our lectures during the UCU strike action!',
     'Learn more at https://www.ucu.org.uk/strikeforuss.',
@@ -34,14 +36,13 @@ def dispatch_event(event):
         if curr_state[0].state == 'email_wait':
             set_QA(event['sender']['id'],'get_email',event['message']['text'])
             set_state(event['sender']['id'],'')
-            send_msg('email registered',event['sender']['id'])
+            send_msg(MESSAGES['get_email'],event['sender']['id'])
 
 
         if curr_state[0].state == 'content_wait':
-            print('went into content_wait if')
             set_QA(event['sender']['id'],'get_content',event['message']['text'])
             set_state(event['sender']['id'],'')
-            send_msg('content registered',event['sender']['id'])
+            send_msg(MESSAGES['get_content'],event['sender']['id'])
 
 
 
@@ -76,78 +77,48 @@ def dispatch_postback_event(event):
 
 
 def get_started_response(recipient_id):
-    for msg in GET_STARTED_RESPONSE_MSGS:
-        send_msg(msg,recipient_id)
+    send_msg_list(MESSAGES['get_started'],recipient_id)
 
-    show_send_email_postback_buttons(recipient_id)
+    show_postback_buttons(recipient_id,**POSTBACKS['get_started'])
 
-
-def show_send_email_postback_buttons(recipient_id):
-    text = "Send angry email?"
-    buttons = [
-        {
-            "type":"postback",
-            "title":"Yes",
-            "payload":"send_email/yes"
-        },
-        {
-            "type":"postback",
-            "title":"No",
-            "payload":"send_email/no"
-        },
-    ]
-    show_postback_buttons(recipient_id,text,buttons)
 
 
 def send_email_yes_response(recipient_id):
-    text = 'Would you like to use an email templete recommended by UCU?'
-    buttons = [
-        {
-            "type":"postback",
-            "title":"Yes",
-            "payload":"use_template/yes"
-        },
-        {
-            "type":"postback",
-            "title":"No",
-            "payload":"use_template/no"
-        },
-    ]
-    show_postback_buttons(recipient_id,text,buttons)
+    show_postback_buttons(recipient_id,**POSTBACKS['send_email_yes'])
 
 
 def send_email_no_response(recipient_id):
-    send_msg('jak nie mejl to nie',recipient_id)
+    send_msg(MESSAGES['send_email_no'],recipient_id)
 
 
 def use_template_yes_response(recipient_id):
     set_state(recipient_id,'email_wait')
-    send_msg('Please input your email:',recipient_id)
+    send_msg(MESSAGES['use_template_yes'],recipient_id)
 
 
 def use_template_no_response(recipient_id):
     set_state(recipient_id,'content_wait')
-    send_msg('Input the content of your email below. The header and footer will be added automatically.',recipient_id)
+    send_msg(MESSAGES['use_template_no'],recipient_id)
 
 
 def confirm_input_content_ok_response(recipient_id):
     set_state(recipient_id,'email_wait')
-    send_msg('The content of your message was set. Please input your email below:',recipient_id)
+    send_msg(MESSAGES['confirm_input_content_ok'],recipient_id)
 
 
 def confirm_input_content_discard_response(recipient_id):
     clear_state(recipient_id)
-    send_msg('All changes were discarded. Click a menu button to start over.',recipient_id)
+    send_msg(MESSAGES['confirm_input_content_discard'],recipient_id)
 
 
 def confirm_send_email_ok_response(recipient_id):
     clear_state(recipient_id)
-    send_msg('email sent',recipient_id)
+    send_msg(MESSAGES['confirm_send_email_ok'],recipient_id)
 
 
 def confirm_send_email_discard_response(recipient_id):
     clear_state(recipient_id)
-    send_msg('email discarded',recipient_id)
+    send_msg(MESSAGES['confirm_send_email_discard'],recipient_id)
 
 
 
@@ -173,6 +144,11 @@ def show_postback_buttons(recipient_id,text,buttons):
         headers = {'content-type': 'application/json'},
         data=json.dumps(payload)
     )
+
+def send_msg_list(text_list,recipient_id):
+    for text in text_list:
+        send_msg(text,recipient_id)
+
 
 
 def send_msg(text,recipient_id):
