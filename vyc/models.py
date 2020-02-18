@@ -11,3 +11,6 @@ class QA(models.Model):
 class State(models.Model):
     u_id = models.IntegerField()
     state = models.CharField(max_length=50,default='')
+
+    def __str__(self):
+        return f'u_id = {self.u_id}\tstate = {self.state}\t'

@@ -21,24 +21,35 @@ def handle_message(req_body):
 
 
 def dispatch_event(event):
+    print(event)
     if 'postback' in event:
         dispatch_postback_event(event)
         return
-        
+
+    if 'message' in event:
+        curr_state = State.objects.filter(u_id=event['sender']['id'])
+        if not curr_state.exists():
+            return
+
+        if curr_state[0].state == 'email_wait':
+            set_QA(event['sender']['id'],'get_email',event['message']['text'])
+            set_state(event['sender']['id'],'')
+            send_msg('email registered',event['sender']['id'])
+
+
+        if curr_state[0].state == 'content_wait':
+            print('went into content_wait if')
+            set_QA(event['sender']['id'],'get_content',event['message']['text'])
+            set_state(event['sender']['id'],'')
+            send_msg('content registered',event['sender']['id'])
+
+
 
 def dispatch_postback_event(event):
     q,a = event['postback']['payload'].split('/')
 
     if not q == 'get_started':
-        curr_qa = QA.objects.filter(
-            u_id=event['sender']['id'],
-            question=q,
-        ).delete()
-        QA(
-            u_id=event['sender']['id'],
-            question=q,
-            anwser=a,
-        ).save()
+        set_QA(event['sender']['id'],q,a)
 
     qa_mapping = {
         'get_started':{
@@ -183,8 +194,21 @@ def send_msg(text,recipient_id):
 
 def set_state(u_id,state):
     clear_state(u_id)
-    State(u_id=u_id,state=state)
+    State(u_id=u_id,state=state).save()
 
 
 def clear_state(u_id):
     State.objects.filter(u_id=u_id).delete()
+
+
+def set_QA(u_id,question,anwser):
+    curr_qa = QA.objects.filter(
+        u_id=u_id,
+        question=question,
+    ).delete()
+
+    QA(
+        u_id=u_id,
+        question=question,
+        anwser=anwser,
+    ).save()
