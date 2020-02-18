@@ -10,7 +10,7 @@ import json
 
 from rest_framework.exceptions import *
 
-from vyc.utils.vyc_bot_utils import handle_message
+from vyc.utils.vyc_bot_logic import handle_message
 
 
 class FacebookWebhooks(CreateView):
@@ -32,7 +32,7 @@ class FacebookWebhooks(CreateView):
 
     def post(self, request, *args, **kwargs):
         req_body = json.loads(request.read().decode('utf-8'))
-        
+
         handle_message(req_body)
 
         return HttpResponse(status=200)

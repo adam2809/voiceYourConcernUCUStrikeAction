@@ -4,6 +4,7 @@ from voiceYourConcern.settings import FB_KEY
 from vyc.models import QA,State
 
 from vyc.utils.vyc_bot_responses import MESSAGES,POSTBACKS
+from vyc.utils.email import send_email
 
 GET_STARTED_RESPONSE_MSGS = [
     'As students we want to support our lectures during the UCU strike action!',
@@ -34,15 +35,11 @@ def dispatch_event(event):
             return
 
         if curr_state[0].state == 'email_wait':
-            set_QA(event['sender']['id'],'get_email',event['message']['text'])
-            set_state(event['sender']['id'],'')
-            send_msg(MESSAGES['get_email'],event['sender']['id'])
+            input_email_response(event['sender']['id'],event['message']['text'])
 
 
         if curr_state[0].state == 'content_wait':
-            set_QA(event['sender']['id'],'get_content',event['message']['text'])
-            set_state(event['sender']['id'],'')
-            send_msg(MESSAGES['get_content'],event['sender']['id'])
+            input_content_response(event['sender']['id'],event['message']['text'])
 
 
 
@@ -88,37 +85,75 @@ def send_email_yes_response(recipient_id):
 
 
 def send_email_no_response(recipient_id):
-    send_msg(MESSAGES['send_email_no'],recipient_id)
+    send_msg_list(MESSAGES['send_email_no'],recipient_id)
 
 
 def use_template_yes_response(recipient_id):
+    set_QA(recipient_id,'use_template','yes')
     set_state(recipient_id,'email_wait')
-    send_msg(MESSAGES['use_template_yes'],recipient_id)
+    send_msg_list(MESSAGES['use_template_yes'],recipient_id)
 
 
 def use_template_no_response(recipient_id):
+    set_QA(recipient_id,'use_template','no')
     set_state(recipient_id,'content_wait')
-    send_msg(MESSAGES['use_template_no'],recipient_id)
+    send_msg_list(MESSAGES['use_template_no'],recipient_id)
+
+
+def input_content_response(recipient_id,anwser):
+    set_QA(recipient_id,'get_content',anwser)
+    set_state(recipient_id,'')
+    show_postback_buttons(recipient_id,**POSTBACKS['input_content'])
 
 
 def confirm_input_content_ok_response(recipient_id):
     set_state(recipient_id,'email_wait')
-    send_msg(MESSAGES['confirm_input_content_ok'],recipient_id)
+    send_msg_list(MESSAGES['confirm_input_content_ok'],recipient_id)
 
 
 def confirm_input_content_discard_response(recipient_id):
     clear_state(recipient_id)
-    send_msg(MESSAGES['confirm_input_content_discard'],recipient_id)
+    send_msg_list(MESSAGES['confirm_input_content_discard'],recipient_id)
+
+
+def input_email_response(recipient_id,anwser):
+    set_QA(recipient_id,'get_email',anwser)
+    set_state(recipient_id,'')
+    send_msg_list(MESSAGES['get_email'],recipient_id)
+    show_postback_buttons(recipient_id,**POSTBACKS['input_email'])
 
 
 def confirm_send_email_ok_response(recipient_id):
     clear_state(recipient_id)
-    send_msg(MESSAGES['confirm_send_email_ok'],recipient_id)
+
+    msg=''
+    use_template_anws = QA.objects.all().filter(
+        u_id=recipient_id,
+        question='use_template'
+    )
+    get_content_anws = QA.objects.all().filter(
+        u_id=recipient_id,
+        question='get_content'
+    )
+    get_email_anws = QA.objects.all().filter(
+        u_id=recipient_id,
+        question='get_email'
+    )
+
+    if use_template_anws[0].anwser == 'yes':
+        msg = 'ucu template'
+    else:
+        if get_content_anws.exists():
+            msg=get_content_anws[0].anwser
+
+    send_email(get_email_anws[0].anwser,'adamkuleszaadamkulesza@gmail.com','Strike action',msg)
+
+    send_msg_list(MESSAGES['confirm_send_email_ok'],recipient_id)
 
 
 def confirm_send_email_discard_response(recipient_id):
     clear_state(recipient_id)
-    send_msg(MESSAGES['confirm_send_email_discard'],recipient_id)
+    send_msg_list(MESSAGES['confirm_send_email_discard'],recipient_id)
 
 
 
@@ -147,7 +182,7 @@ def show_postback_buttons(recipient_id,text,buttons):
 
 def send_msg_list(text_list,recipient_id):
     for text in text_list:
-        send_msg(text,recipient_id)
+        print(send_msg(text,recipient_id).content)
 
 
 
