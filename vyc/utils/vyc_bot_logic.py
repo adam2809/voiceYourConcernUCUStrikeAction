@@ -1,5 +1,7 @@
 import requests
 import json
+import re
+
 from voiceYourConcern.settings import FB_KEY
 from vyc.models import QA,State
 
@@ -13,7 +15,7 @@ GET_STARTED_RESPONSE_MSGS = [
 
 fb_api_url = f'https://graph.facebook.com/v6.0/me/messages?access_token={FB_KEY}'
 
-
+EMAIL_ADDRESS_REGEX = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
 
 
 def handle_message(req_body):
@@ -84,10 +86,10 @@ def dispatch_postback_event(event):
 
 def get_started_response(recipient_id):
     send_msg_list(MESSAGES['get_started'],recipient_id)
-
     show_url_buttons(recipient_id)
-
     show_postback_buttons(recipient_id,**POSTBACKS['get_started'])
+    send_msg("If you have any questions don't hasitatate to ask and one of the page administrators should get back you you soon.")
+
 
 
 
@@ -129,9 +131,17 @@ def discard_flow(recipient_id):
 
 
 def input_email_response(recipient_id,anwser):
+    if not is_address_valid(anwser.strip()):
+        show_postback_buttons(recipient_id,**POSTBACKS['invalid_email'])
+        return
+
     set_QA(recipient_id,'get_email',anwser)
     set_state(recipient_id,'name_wait')
     show_postback_buttons(recipient_id,**POSTBACKS['input_email'])
+
+
+def is_address_valid(email):
+    return bool(re.search(EMAIL_ADDRESS_REGEX,email))
 
 
 def input_name_response(recipient_id,anwser):
@@ -176,6 +186,7 @@ def confirm_send_email_ok_response(recipient_id):
     )
 
     send_msg_list(MESSAGES['confirm_send_email_ok'],recipient_id)
+    clear_session(recipient_id)
 
 
 def confirm_send_email_discard_response(recipient_id):

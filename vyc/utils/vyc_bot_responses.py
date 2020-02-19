@@ -82,7 +82,17 @@ POSTBACKS = {
 	    ]
 	},
 	'email_input_prompt':{
-		'text': 'Please enter your email',
+		'text': 'Please enter your email.',
+		'buttons' : [
+	        {
+	            "type":"postback",
+	            "title":"Cancel",
+	            "payload":"cancel_input/none"
+	        }
+	    ]
+	},
+	'invalid_email':{
+		'text': 'Please enter a valid email address.',
 		'buttons' : [
 	        {
 	            "type":"postback",
