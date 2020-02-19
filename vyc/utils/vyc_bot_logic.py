@@ -85,6 +85,8 @@ def dispatch_postback_event(event):
 def get_started_response(recipient_id):
     send_msg_list(MESSAGES['get_started'],recipient_id)
 
+    show_url_buttons(recipient_id)
+
     show_postback_buttons(recipient_id,**POSTBACKS['get_started'])
 
 
@@ -94,6 +96,7 @@ def send_email_yes_response(recipient_id):
 
 
 def send_email_no_response(recipient_id):
+    clear_session(recipient_id)
     send_msg_list(MESSAGES['send_email_no'],recipient_id)
 
 
@@ -206,7 +209,7 @@ def show_postback_buttons(recipient_id,text,buttons):
 
 def send_msg_list(text_list,recipient_id):
     for text in text_list:
-        print(send_msg(text,recipient_id).content)
+        send_msg(text,recipient_id).content
 
 
 
@@ -226,6 +229,49 @@ def send_msg(text,recipient_id):
         headers = {'content-type': 'application/json'},
         data=json.dumps(payload)
     )
+
+def show_url_buttons(recipient_id):
+    payload = {
+        "recipient":{
+            "id":recipient_id
+        },
+        "message":{
+            "attachment":{
+                "type":"template",
+                "payload":{
+                    "template_type":"button",
+                    "text":"Click one of the buttons below to get involved!",
+                    "buttons":[
+                        {
+                            "type":"web_url",
+                            "url":"https://www.ucu.org.uk/",
+                            "title":"Visit the UCU website",
+                            "webview_height_ratio": "full"
+                        },
+                        {
+                            "type":"web_url",
+                            "url":"https://www.facebook.com/sharer/sharer.php?u=https://www.facebook.com/Nottingham-Student-Solidarity-1615346261890381/",
+                            "title":"Share our page",
+                            "webview_height_ratio": "compact"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+
+    return requests.post(
+        url=fb_api_url,
+        headers = {'content-type': 'application/json'},
+        data=json.dumps(payload)
+    )
+
+    return requests.post(
+        url=fb_api_url,
+        headers = {'content-type': 'application/json'},
+        data=json.dumps(payload)
+    )
+
 
 def set_state(u_id,state):
     clear_state(u_id)
