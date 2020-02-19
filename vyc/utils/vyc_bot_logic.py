@@ -20,6 +20,7 @@ def handle_message(req_body):
     if req_body['object'] == 'page':
         for entry in req_body['entry']:
             for event in entry['messaging']:
+                print(event)
                 dispatch_event(event)
 
 
@@ -35,10 +36,15 @@ def dispatch_event(event):
 
         if curr_state[0].state == 'email_wait':
             input_email_response(event['sender']['id'],event['message']['text'])
-
+            return
 
         if curr_state[0].state == 'content_wait':
             input_content_response(event['sender']['id'],event['message']['text'])
+            return
+
+        if curr_state[0].state == 'name_wait':
+            input_name_response(event['sender']['id'],event['message']['text'])
+            return
 
 
 
@@ -62,12 +68,16 @@ def dispatch_postback_event(event):
         },
         'confirm_input_content':{
             'ok' : confirm_input_content_ok_response,
-            'discard' : confirm_input_content_discard_response,
+            'discard' : discard_flow,
         },
         'confirm_send_email':{
             'ok' : confirm_send_email_ok_response,
-            'discard' : confirm_send_email_discard_response,
+            'discard' : discard_flow,
         },
+        'cancel_input':{
+            'none' : discard_flow,
+        }
+
     }
     qa_mapping[q][a](event['sender']['id'])
 
@@ -90,7 +100,7 @@ def send_email_no_response(recipient_id):
 def use_template_yes_response(recipient_id):
     set_QA(recipient_id,'use_template','yes')
     set_state(recipient_id,'email_wait')
-    send_msg_list(MESSAGES['use_template_yes'],recipient_id)
+    show_postback_buttons(recipient_id,**POSTBACKS['email_input_prompt'])
 
 
 def use_template_no_response(recipient_id):
@@ -107,26 +117,29 @@ def input_content_response(recipient_id,anwser):
 
 def confirm_input_content_ok_response(recipient_id):
     set_state(recipient_id,'email_wait')
-    send_msg_list(MESSAGES['confirm_input_content_ok'],recipient_id)
+    show_postback_buttons(recipient_id,**POSTBACKS['email_input_prompt'])
 
 
-def confirm_input_content_discard_response(recipient_id):
-    clear_state(recipient_id)
-    send_msg_list(MESSAGES['confirm_input_content_discard'],recipient_id)
+def discard_flow(recipient_id):
+    clear_session(recipient_id)
+    send_msg_list(MESSAGES['discard_flow'],recipient_id)
 
 
 def input_email_response(recipient_id,anwser):
     set_QA(recipient_id,'get_email',anwser)
-    set_state(recipient_id,'')
-    send_msg_list(MESSAGES['get_email'],recipient_id)
+    set_state(recipient_id,'name_wait')
     show_postback_buttons(recipient_id,**POSTBACKS['input_email'])
+
+
+def input_name_response(recipient_id,anwser):
+    set_QA(recipient_id,'get_name',anwser)
+    set_state(recipient_id,'')
+    show_postback_buttons(recipient_id,**POSTBACKS['input_name'])
 
 
 def confirm_send_email_ok_response(recipient_id):
     clear_state(recipient_id)
 
-    footer_with_name = UCU_TEMPLATE_FOOTER % 'tmp name'
-    msg=f'{UCU_TEMPLATE_HEADER}%s{footer_with_name}'
     use_template_anws = QA.objects.all().filter(
         u_id=recipient_id,
         question='use_template'
@@ -139,6 +152,13 @@ def confirm_send_email_ok_response(recipient_id):
         u_id=recipient_id,
         question='get_email'
     )
+    get_name_anws = QA.objects.all().filter(
+        u_id=recipient_id,
+        question='get_name'
+    )
+
+    footer_with_name = UCU_TEMPLATE_FOOTER % get_name_anws[0].anwser
+    msg=f'{UCU_TEMPLATE_HEADER}%s{footer_with_name}'
 
     if use_template_anws[0].anwser == 'yes' or (not get_content_anws.exists()):
         msg = msg % UCU_TEMPLATE_CONTENT
@@ -214,6 +234,11 @@ def set_state(u_id,state):
 
 def clear_state(u_id):
     State.objects.filter(u_id=u_id).delete()
+
+
+def clear_session(u_id):
+    State.objects.filter(u_id=u_id).delete()
+    QA.objects.filter(u_id=u_id).delete()
 
 
 def set_QA(u_id,question,anwser):

@@ -6,12 +6,10 @@ MESSAGES = {
 	    'Learn more at https://www.ucu.org.uk/strikeforuss.',
 	],
 	'send_email_no':['jak nie mejl to nie'],
-	'use_template_yes':[email_input_prompt],
 	'use_template_no':['Input the content of your email below. The header and footer will be added automatically.'],
-	'confirm_input_content_ok':['The content of your message was set.',email_input_prompt],
 	'confirm_input_content_discard':['All changes were discarded. Click a menu button to start over.'],
 	'confirm_send_email_ok':['email sent'],
-	'confirm_send_email_discard':['email discarded'],
+	'discard_flow':['All changes were discarded','If you want to start again click the menu button'],
 	'get_email':['email registered'],
 	'get_content':['content registered'],
 }
@@ -62,7 +60,7 @@ POSTBACKS = {
 	        },
 	    ]
 	},
-	'input_email':{
+	'input_name':{
 		'text': 'Do you confirm you want to send email?',
 		'buttons' : [
 	        {
@@ -75,6 +73,26 @@ POSTBACKS = {
 	            "title":"Discard",
 	            "payload":"confirm_send_email/discard"
 	        },
+	    ]
+	},
+	'input_email':{
+		'text': 'Please enter your name',
+		'buttons' : [
+	        {
+	            "type":"postback",
+	            "title":"Cancel",
+	            "payload":"cancel_input/none"
+	        }
+	    ]
+	},
+	'email_input_prompt':{
+		'text': 'Please enter your email',
+		'buttons' : [
+	        {
+	            "type":"postback",
+	            "title":"Cancel",
+	            "payload":"cancel_input/none"
+	        }
 	    ]
 	}
 }
