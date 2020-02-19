@@ -78,3 +78,20 @@ POSTBACKS = {
 	    ]
 	}
 }
+
+
+UCU_TEMPLATE_CONTENT = '''
+I am writing to complain about the impact of the UCU strike action upon my education.
+<br/>
+I chose this university in large part due to the staff and I believe that they are the university's greatest asset.
+<br/>
+As things stand this university, my university, has alienated its staff and is failing me and my fellow students.
+<br/>
+I urge you to increase your efforts to seek a resolution through national negotiations with UCU in order to enable me to get the education that I deserve.
+'''
+
+UCU_TEMPLATE_HEADER = 'Dear vice-chancellor<br/><br/>'
+
+UCU_TEMPLATE_FOOTER = '<br/><br/>Yours<br/>%s'
+
+VC_EMAIL_ADDRESS = 'vco-feedback@nottingham.ac.uk'

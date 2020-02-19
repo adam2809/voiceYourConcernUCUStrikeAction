@@ -3,7 +3,7 @@ import json
 from voiceYourConcern.settings import FB_KEY
 from vyc.models import QA,State
 
-from vyc.utils.vyc_bot_responses import MESSAGES,POSTBACKS
+from vyc.utils.vyc_bot_responses import MESSAGES,POSTBACKS,UCU_TEMPLATE_CONTENT,UCU_TEMPLATE_HEADER,UCU_TEMPLATE_FOOTER,VC_EMAIL_ADDRESS
 from vyc.utils.email import send_email
 
 GET_STARTED_RESPONSE_MSGS = [
@@ -24,7 +24,6 @@ def handle_message(req_body):
 
 
 def dispatch_event(event):
-    print(event)
     if 'postback' in event:
         dispatch_postback_event(event)
         return
@@ -126,7 +125,8 @@ def input_email_response(recipient_id,anwser):
 def confirm_send_email_ok_response(recipient_id):
     clear_state(recipient_id)
 
-    msg=''
+    footer_with_name = UCU_TEMPLATE_FOOTER % 'tmp name'
+    msg=f'{UCU_TEMPLATE_HEADER}%s{footer_with_name}'
     use_template_anws = QA.objects.all().filter(
         u_id=recipient_id,
         question='use_template'
@@ -140,13 +140,17 @@ def confirm_send_email_ok_response(recipient_id):
         question='get_email'
     )
 
-    if use_template_anws[0].anwser == 'yes':
-        msg = 'ucu template'
+    if use_template_anws[0].anwser == 'yes' or (not get_content_anws.exists()):
+        msg = msg % UCU_TEMPLATE_CONTENT
     else:
-        if get_content_anws.exists():
-            msg=get_content_anws[0].anwser
+        msg = msg % get_content_anws[0].anwser
 
-    send_email(get_email_anws[0].anwser,'adamkuleszaadamkulesza@gmail.com','Strike action',msg)
+    send_email(
+        from_email=get_email_anws[0].anwser,
+        to='adamkuleszaadamkulesza@gmail.com',
+        subject='Strike action',
+        content=msg
+    )
 
     send_msg_list(MESSAGES['confirm_send_email_ok'],recipient_id)
 

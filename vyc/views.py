@@ -8,6 +8,8 @@ from voiceYourConcern.settings import VERIFY_TOKEN
 
 import json
 
+from traceback import print_exc
+
 from rest_framework.exceptions import *
 
 from vyc.utils.vyc_bot_logic import handle_message
@@ -33,6 +35,10 @@ class FacebookWebhooks(CreateView):
     def post(self, request, *args, **kwargs):
         req_body = json.loads(request.read().decode('utf-8'))
 
-        handle_message(req_body)
+        try:
+            handle_message(req_body)
+        except Exception as e:
+            print_exc()
+            return HttpResponse(status=200)
 
         return HttpResponse(status=200)
