@@ -85,10 +85,11 @@ def dispatch_postback_event(event):
 
 
 def get_started_response(recipient_id):
+    set_menu_buttons(recipient_id)
     send_msg_list(MESSAGES['get_started'],recipient_id)
     show_url_buttons(recipient_id)
     show_postback_buttons(recipient_id,**POSTBACKS['get_started'])
-    send_msg("If you have any questions don't hasitatate to ask and one of the page administrators should get back you you soon.")
+    send_msg("If you have any questions don't hasitatate to ask and one of our page administrators should get back you you soon.",recipient_id)
 
 
 
@@ -276,6 +277,25 @@ def show_url_buttons(recipient_id):
         headers = {'content-type': 'application/json'},
         data=json.dumps(payload)
     )
+
+
+def set_menu_buttons(recipient_id):
+    payload = {
+        "psid": "2884950064899015",
+        "persistent_menu": [
+            {
+                "locale": "default",
+                "composer_input_disabled": 'false',
+                "call_to_actions": [
+                    {
+                        "type": "postback",
+                        "title": "Send email to administration",
+                        "payload": "send_email/yes"
+                    }
+                ]
+            }
+        ]
+    }
 
     return requests.post(
         url=fb_api_url,

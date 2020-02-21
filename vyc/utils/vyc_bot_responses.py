@@ -10,7 +10,7 @@ MESSAGES = {
 	'use_template_no':['Input the content of your email below. The header and footer will be added automatically.'],
 	'confirm_input_content_discard':['All changes were discarded. Click a menu button to start over.'],
 	'confirm_send_email_ok':['The email was sent. Thank you for getting involved!'],
-	'discard_flow':['All changes were discarded','If you want to start again click the menu button'],
+	'discard_flow':['All changes were discarded','If you want to start again click the menu button below.'],
 	'get_email':['Email address registered'],
 	'get_content':['Email content saved.'],
 }
