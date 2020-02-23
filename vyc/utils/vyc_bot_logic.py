@@ -253,14 +253,14 @@ def show_url_buttons(recipient_id):
                     "buttons":[
                         {
                             "type":"web_url",
-                            "url":"https://www.ucu.org.uk/",
-                            "title":"Visit the UCU website",
-                            "webview_height_ratio": "full"
+                            "url":"https://www.facebook.com/sharer/sharer.php?u=https://www.facebook.com/Nottingham-Student-Solidarity-1615346261890381/",
+                            "title":"Share our page",
+                            "webview_height_ratio": "compact"
                         },
                         {
                             "type":"web_url",
-                            "url":"https://www.facebook.com/sharer/sharer.php?u=https://www.facebook.com/Nottingham-Student-Solidarity-1615346261890381/",
-                            "title":"Share our page",
+                            "url":"https://medium.com/@katecross_88138/ucu-strike-2020-a-guide-for-perplexed-students-a247e2a01b88",
+                            "title":"UCU strikes guide",
                             "webview_height_ratio": "compact"
                         }
                     ]
