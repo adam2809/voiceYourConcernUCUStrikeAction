@@ -8,6 +8,13 @@ fb_api_url = f'https://graph.facebook.com/v2.6/me/messenger_profile?access_token
 
 class Command(BaseCommand):
     def handle(self,*args,**options):
+
+        payload_get_started = {
+            "get_started": {
+                "payload": "get_started/none"
+            }
+        }
+
         payload_persistant_menu = {
             "persistent_menu": [
                 {
@@ -24,12 +31,6 @@ class Command(BaseCommand):
             ]
         }
 
-        payload_get_started = {
-            "get_started": {
-                "payload": "get_started/none"
-            }
-        }
-
         payload_greeting = {
             "greeting": [
                 {
@@ -39,7 +40,7 @@ class Command(BaseCommand):
             ]
         }
 
-        for payload in [payload_persistant_menu,payload_get_started,payload_greeting]:
+        for payload in [payload_get_started,payload_persistant_menu,payload_greeting]:
             print(requests.post(
                 url=fb_api_url,
                 headers = {'content-type': 'application/json'},

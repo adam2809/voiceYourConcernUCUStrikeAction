@@ -18,5 +18,6 @@ from django.contrib import admin
 from vyc.views import *
 
 urlpatterns = [
+    url(r'^policy$', privacy_policy),
     url(r'^$', FacebookWebhooks.as_view()),
 ]

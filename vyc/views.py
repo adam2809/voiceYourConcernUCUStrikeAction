@@ -42,3 +42,9 @@ class FacebookWebhooks(CreateView):
             return HttpResponse(status=200)
 
         return HttpResponse(status=200)
+
+
+
+def privacy_policy(request):
+    with open('vyc/privacyPolicy.html') as f:
+        return HttpResponse(f.read())
