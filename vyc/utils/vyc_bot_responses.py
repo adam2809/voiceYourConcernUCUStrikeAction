@@ -13,6 +13,7 @@ MESSAGES = {
 	'discard_flow':['All changes were discarded','If you want to start again click the menu button below.'],
 	'get_email':['Email address registered'],
 	'get_content':['Email content saved.'],
+	'error_confirm_send_email':['Something went wrong press the menu button below or delete the conversation to start over.'],
 }
 
 POSTBACKS = {
@@ -116,6 +117,6 @@ I urge you to increase your efforts to seek a resolution through national negoti
 
 UCU_TEMPLATE_HEADER = 'Dear vice-chancellor<br/><br/>'
 
-UCU_TEMPLATE_FOOTER = '<br/><br/>Yours<br/>%s'
+UCU_TEMPLATE_FOOTER = '<br/><br/>Yours,<br/>%s'
 
 VC_EMAIL_ADDRESS = 'vco-feedback@nottingham.ac.uk'

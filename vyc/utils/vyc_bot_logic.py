@@ -62,7 +62,6 @@ def dispatch_postback_event(event):
         },
         'send_email':{
             'yes' : send_email_yes_response,
-            'no' : send_email_no_response,
         },
         'use_template':{
             'yes' : use_template_yes_response,
@@ -85,22 +84,16 @@ def dispatch_postback_event(event):
 
 
 def get_started_response(recipient_id):
-    print(recipient_id)
+    clear_session(recipient_id)
     send_msg_list(MESSAGES['get_started'],recipient_id)
     show_url_buttons(recipient_id)
     show_postback_buttons(recipient_id,**POSTBACKS['get_started'])
     send_msg("If you have any questions don't hasitatate to ask and one of our page administrators should get back you you soon.",recipient_id)
 
 
-
-
 def send_email_yes_response(recipient_id):
-    show_postback_buttons(recipient_id,**POSTBACKS['send_email_yes'])
-
-
-def send_email_no_response(recipient_id):
     clear_session(recipient_id)
-    send_msg_list(MESSAGES['send_email_no'],recipient_id)
+    show_postback_buttons(recipient_id,**POSTBACKS['send_email_yes'])
 
 
 def use_template_yes_response(recipient_id):
@@ -171,6 +164,10 @@ def confirm_send_email_ok_response(recipient_id):
         question='get_name'
     )
 
+    if not all([use_template_anws,get_email_anws,get_name_anws]):
+        send_msg_list(MESSAGES['error_confirm_send_email'],recipient_id)
+        return
+
     footer_with_name = UCU_TEMPLATE_FOOTER % get_name_anws[0].anwser
     msg=f'{UCU_TEMPLATE_HEADER}%s{footer_with_name}'
 
@@ -191,7 +188,7 @@ def confirm_send_email_ok_response(recipient_id):
 
 
 def confirm_send_email_discard_response(recipient_id):
-    clear_state(recipient_id)
+    clear_session(recipient_id)
     send_msg_list(MESSAGES['confirm_send_email_discard'],recipient_id)
 
 
