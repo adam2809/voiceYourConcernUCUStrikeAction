@@ -178,7 +178,7 @@ def confirm_send_email_ok_response(recipient_id):
 
     send_email(
         from_email=get_email_anws[0].anwser,
-        to='adamkuleszaadamkulesza@gmail.com',
+        to=VC_EMAIL_ADDRESS,
         subject='Strike action',
         content=msg
     )
